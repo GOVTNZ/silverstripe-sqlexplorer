@@ -1,0 +1,20 @@
+.result-data table {
+	border-collapse: collapse;
+}
+
+.result-data table td {
+	padding: 4px;
+}
+
+.result-data th td {
+	font-weight: bold;
+}
+
+.result-data table, .result-data th, .result-data td {
+	border: 1px solid #aaaaaa;
+}
+
+.sql-explorer-query-field .warning {
+	color: red;
+	font-weight: bold;
+}
