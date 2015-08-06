@@ -31,7 +31,7 @@
 		var sql = $('textarea', $field).val();
 
 		var url = controllerURL() + 'export';
-		url += '?query=' + sql;
+		url += '?query=' + encodeURIComponent(sql);
 
 		var iframe = document.createElement("iframe");
 		iframe.setAttribute("src", url);
