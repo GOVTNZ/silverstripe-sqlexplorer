@@ -24,29 +24,54 @@ class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest {
 		'' => 'edit',
 	);
 
+	// API method to get data for ajax request. Returns an application/json response.
 	public function getData() {
-		$response = $this->getDataInternal();
-		if (!is_array($response)) {
-			// Might have hit an error
-			return;
-		}
+		$controller = Controller::curr();
+		$controller->getResponse()->addHeader('Content-Type', 'application/json');
 
-		return Convert::raw2json($response);
+		try {
+			$response = $this->getDataInternal();
+			if (!is_array($response)) {
+				throw new Exception('Could not execute data');
+			}
+
+			return Convert::raw2json($response);
+		}
+		catch (Exception $e) {
+			$response = array(
+				'status' => 'error',
+				'error' => $e->getMessage(),
+				'temCount' => 0,
+				'totalCount' => 0
+			);
+			return Convert::raw2json($response);
+		}
+	}
+
+	// A simple error handler that is set for the SQL execution, which takes a user error
+	// and throws it as an exception. This lets us catch it and return it in the ajax response.
+	public function errorHandler($errorNo, $message) {
+		throw new Exception($message);
 	}
 
 	// Actual implementation to fetch the query, check security and execute it. Returns a map with 
-	// response properties.
+	// response properties. Errors are thrown as exceptions.
 	protected function getDataInternal() {
 		if (!Permission::checkMember(Member::currentUser(), 'ADMIN')) {
 			return Security::permissionFailure($this);
 		}
+
+		// Set an error handler to catch SQL errors
+		set_error_handler(array('SQLExplorerQueryGrid_ItemRequest', 'errorHandler'));
 
 		$sql = $_REQUEST['query'];
 		if (!$this->validSQL($sql)) {
 			throw new Exception("Invalid SQL");
 		}
 
-		$raw = DB::query($sql);
+		// Execute the query, with errors being generated as a warning, so the error handler will see it.
+		// (The default is fatal, and the error handler is not invoked.)
+		$raw = DB::query($sql, E_USER_WARNING);
 
 		// return the data as a JSON object containing a collection, each record being an object in that
 		// collection. We need to be mindful that the dataset may be large.
@@ -62,9 +87,6 @@ class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest {
 			}
 			$items[] = $record;
 		}
-
-		$controller = Controller::curr();
-		$controller->getResponse()->addHeader('Content-Type', 'application/json');
 
 		$response = array(
 			"status" => "ok",
@@ -108,22 +130,26 @@ class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest {
 	}
 
 	public function export() {
-		if ($fileData = $this->generateExportFileData()){
-			return SS_HTTPRequest::send_file($fileData, "extract.csv", 'text/csv');
+		try {
+			if ($fileData = $this->generateExportFileData()){
+				return SS_HTTPRequest::send_file($fileData, "extract.csv", 'text/csv');
+			}
+		} catch (Exception $e) {
+			return "Could not extract query: " . $e->getMessage();
 		}
 	}
 
 	public function generateExportFileData() {
 		$data = $this->getDataInternal();
 		if (!is_array($data)) {
-			return;
+			throw new Exception("Result is not an array");
 		}
 
 		$data = $data["items"];
 
 		if (count($data) == 0) {
 			// no data - nothing to download, and can't figure the columns
-			return;
+			throw new Exception("No data");
 		}
 
 		// @todo consider moving separate and whether we want a header to the saved query object.

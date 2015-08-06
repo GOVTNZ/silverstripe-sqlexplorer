@@ -14,7 +14,8 @@ class SQLExplorerSavedQuery extends DataObject {
 		$fields->removeByName('SQLText');
 		$fields->addFieldsToTab('Root.Main', array(
 			new SQLExplorerQueryField('SQLText', 'SQL query'),
-			new LiteralField('ResultData', '<div class="sql-explorer result-data"></div>')
+			new LiteralField('ResultData', '<div class="sql-explorer result-data"></div>'),
+			new LiteralField('QueryError', '<div class="sql-explorer query-error"></div>')
 		));
 
 		return $fields;

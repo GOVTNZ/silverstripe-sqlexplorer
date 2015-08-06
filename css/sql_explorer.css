@@ -18,3 +18,8 @@
 	color: red;
 	font-weight: bold;
 }
+
+.sql-explorer.query-error {
+	color: red;
+	font-weight: bold;
+}

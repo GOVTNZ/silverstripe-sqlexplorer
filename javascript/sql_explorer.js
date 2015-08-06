@@ -10,13 +10,15 @@
 			data: {
 				query: sql
 			},
-			success: function(data, textStatus, jqXHR) {
-				if (data.status == "ok") {
+			success: function(data, textStatus, jQueryXHR) {
+				if (data.status == 'ok') {
 					showTable($field, data);
+				} else {
+					showError(data.error);
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				alert(textStatus);
+				showError(textStatus);
 			}
 		})
 		return false;
@@ -77,5 +79,11 @@
 	// Given a data response, populate a table to show the data.
 	var showTable = function($field, data) {
 		$('.result-data').html(getDataAsTable(data.items));
+		$('.query-error').html('');
+	};
+
+	var showError = function(msg) {
+		$('.result-data').html('');
+		$('.query-error').html(msg);
 	};
 })(jQuery);
