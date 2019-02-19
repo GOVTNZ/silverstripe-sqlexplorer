@@ -1,7 +1,7 @@
 {
 	"name": "govtnz/silverstripe-sqlexplorer",
 	"description": "A SilverStripe module to provide read-only access to a database for suitably privileged users.",
-	"type": "silverstripe-module",
+	"type": "silverstripe-vendormodule",
 	"homepage": "http://github.com/govtnz/silverstripe-sqlexplorer",
 	"keywords": ["silverstripe", "sql"],
 	"license": "BSD-3-Clause",
@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "GovtNZ\\SilverStripe\\SqlExplorer": "src"
+            "GovtNZ\\SilverStripe\\SqlExplorer\\": "src"
         }
     },
     "extra": {
