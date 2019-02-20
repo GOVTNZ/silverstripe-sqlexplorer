@@ -1,22 +1,30 @@
 <?php
 
-class SQLExplorerTableSearchContext extends SearchContext {
-	public function getResults($searchParams, $sort = false, $limit = false) {
-		$searchParams = array_filter((array)$searchParams, array($this,'clearEmptySearchFields'));
+namespace GovtNZ\SilverStripe\SqlExplorer;
 
-		$tables = DB::tableList();
-		$result = new ArrayList();
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\Search\SearchContext;
 
-		$i = 1;
+class SQLExplorerTableSearchContext extends SearchContext
+{
+    public function getResults($searchParams, $sort = false, $limit = false)
+    {
+        $searchParams = array_filter((array)$searchParams, array($this,'clearEmptySearchFields'));
 
-		foreach ($tables as $k => $tableName) {
-			$table = new SQLExplorerTable();
-			$table->ID = $i++;
-			$table->TableName = $tableName;
-			$table->Title = $tableName;  // necessary to get grid field to display the name on the detail editor.
-			$result->push($table);
-		}
+        $tables = DB::tableList();
+        $result = new ArrayList();
 
-		return $result;
-	}
+        $i = 1;
+
+        foreach ($tables as $k => $tableName) {
+            $table = new SQLExplorerTable();
+            $table->ID = $i++;
+            $table->TableName = $tableName;
+            $table->Title = $tableName;  // necessary to get grid field to display the name on the detail editor.
+            $result->push($table);
+        }
+
+        return $result;
+    }
 }

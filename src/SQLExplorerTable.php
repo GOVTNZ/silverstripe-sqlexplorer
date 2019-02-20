@@ -1,125 +1,142 @@
 <?php
 
-// SQLExplorerTable is an in-memory only object that represents a table in the database.
-class SQLExplorerTable extends ViewableData {
+namespace GovtNZ\SilverStripe\SqlExplorer;
 
-	// A fake, allocated ID so that URL routing works, otherwise we see every view as a create.
-	var $ID;
+use SilverStripe\View\ViewableData;
 
-	// Name of the database table.
-	var $TableName;
+class SQLExplorerTable extends ViewableData
+{
 
-	// Required to get grid field to display the table name. We copy the table name here.
-	var $Title;
+    // A fake, allocated ID so that URL routing works, otherwise we see every view as a create.
+    var $ID;
 
-	private static $singular_name = "Table";
+    // Name of the database table.
+    var $TableName;
 
-	private static $db = array(
-		'TableName' => 'Varchar(255)'
-	);
+    // Required to get grid field to display the table name. We copy the table name here.
+    var $Title;
 
-	private static $summary_fields = array(
-		'TableName' => 'TableName'
-	);
+    private static $singular_name = "Table";
 
-	private static $searchable_fields = array(
-		'TableName'
-	);
+    private static $db = array(
+        'TableName' => 'Varchar(255)'
+    );
 
-	public function i18n_singular_name() {
-		return _t($this->class.'.SINGULARNAME', $this->singular_name());
-	}
+    private static $summary_fields = array(
+        'TableName' => 'TableName'
+    );
 
-	public static function singular_name() {
-		return self::$singular_name;
-	}
+    private static $searchable_fields = array(
+        'TableName'
+    );
 
-	public function getDefaultSearchContext() {
-		return new SQLExplorerTableSearchContext(
-			$this->class
-			// $this->scaffoldSearchFields(), 
-			// $this->defaultSearchFilters()
-		);
-	}
+    public function i18n_singular_name()
+    {
+        return _t($this->class.'.SINGULARNAME', $this->singular_name());
+    }
 
-	public function canCreate($member = null) {
-		return false;
-	}
+    public static function singular_name()
+    {
+        return self::$singular_name;
+    }
 
-	public function summaryFields() {
-		return self::$summary_fields;
-	}
+    public function getDefaultSearchContext()
+    {
+        return new SQLExplorerTableSearchContext(
+            $this->class
+            // $this->scaffoldSearchFields(),
+            // $this->defaultSearchFilters()
+        );
+    }
 
-	public function canDelete($member = null) {
-		return false;
-	}
+    public function canCreate($member = null)
+    {
+        return false;
+    }
 
-	public function canEdit($member = null) {
-		return false;
-	}
+    public function summaryFields()
+    {
+        return self::$summary_fields;
+    }
 
-	public function canView($member = null) {
-		return true;
-	}
+    public function canDelete($member = null)
+    {
+        return false;
+    }
 
-	public function Title() {
-		return $this->TableName;
-	}
+    public function canEdit($member = null)
+    {
+        return false;
+    }
 
-	public function getCMSFields() {
-		$fields = new FieldList();
+    public function canView($member = null)
+    {
+        return true;
+    }
 
-		$tabs = new TabSet(
-			$name = 'Root',
-			new Tab(
-				$title = "Data",
-				$this->getTableDataField()
-			),
-			new Tab(
-				$title = "Structure",
-				$this->getTableStructureField()
-			)
-		);
+    public function Title()
+    {
+        return $this->TableName;
+    }
 
-		// $tabs = $this->getTableDataField();
-		$fields->push($tabs);
+    public function getCMSFields()
+    {
+        $fields = new FieldList();
 
-		// $fields->addFieldToTab('Root.Data', $this->getTableDataField());
+        $tabs = new TabSet(
+            $name = 'Root',
+            new Tab(
+                $title = "Data",
+                $this->getTableDataField()
+            ),
+            new Tab(
+                $title = "Structure",
+                $this->getTableStructureField()
+            )
+        );
 
-		return $fields;
-	}
+        // $tabs = $this->getTableDataField();
+        $fields->push($tabs);
 
-	// Return a GridField that shows a pagination list of all the data in this table.
-	function getTableDataField() {
-		$list = $this->getTableData();
+        // $fields->addFieldToTab('Root.Data', $this->getTableDataField());
 
-		$config = GridFieldConfig_RecordViewer::create();
+        return $fields;
+    }
 
-		$field = new GridField("TableData", "Data", $list, $config);
-		$field->setModelClass('SQLExplorerTable');
+    // Return a GridField that shows a pagination list of all the data in this table.
+    function getTableDataField()
+    {
+        $list = $this->getTableData();
 
-		return $field;
-	}
+        $config = GridFieldConfig_RecordViewer::create();
 
-	// Return table in an ArrayList. If there are no records, return null.
-	function getTableData() {
-		$raw = DB::query("select * from \"" . $this->TableName . "\"");
-		if (count($raw) == 0) {
-			return null;
-		}
+        $field = new GridField("TableData", "Data", $list, $config);
+        $field->setModelClass('SQLExplorerTable');
 
-		$result = new ArrayList();
+        return $field;
+    }
 
-		foreach ($raw as $item) {
-			$result->push(new ArrayData($item));
-		}
+    // Return table in an ArrayList. If there are no records, return null.
+    function getTableData()
+    {
+        $raw = DB::query("select * from \"" . $this->TableName . "\"");
+        if (count($raw) == 0) {
+            return null;
+        }
 
-		return $result;
-	}
+        $result = new ArrayList();
 
-	// Return a GridField that shows the columns for this table, including column metadata.
-	function getTableStructureField() {
-		$field = new GridField("TableColumns", "Columns", null);
-		return $field;
-	}
+        foreach ($raw as $item) {
+            $result->push(new ArrayData($item));
+        }
+
+        return $result;
+    }
+
+    // Return a GridField that shows the columns for this table, including column metadata.
+    function getTableStructureField()
+    {
+        $field = new GridField("TableColumns", "Columns", null);
+        return $field;
+    }
 }

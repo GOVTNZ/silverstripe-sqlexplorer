@@ -1,10 +1,10 @@
 {
-	"name": "govtnz/silverstripe-sqlexplorer",
-	"description": "A SilverStripe module to provide read-only access to a database for suitably privileged users.",
-	"type": "silverstripe-vendormodule",
-	"homepage": "http://github.com/govtnz/silverstripe-sqlexplorer",
-	"keywords": ["silverstripe", "sql"],
-	"license": "BSD-3-Clause",
+    "name": "govtnz/silverstripe-sqlexplorer",
+    "description": "A SilverStripe module to provide read-only access to a database for suitably privileged users.",
+    "type": "silverstripe-vendormodule",
+    "homepage": "http://github.com/govtnz/silverstripe-sqlexplorer",
+    "keywords": ["silverstripe", "sql"],
+    "license": "BSD-3-Clause",
     "authors": [{
       "name": "Govt.nz",
       "email": "govtnz@dia.govt.nz"
@@ -21,6 +21,9 @@
     "extra": {
       "branch-alias": {
         "dev-master": "2.x-dev"
-      }
+      },
+      "expose": [
+        "client"
+      ]
     }
 }
