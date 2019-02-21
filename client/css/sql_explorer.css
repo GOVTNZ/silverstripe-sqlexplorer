@@ -1,17 +1,26 @@
 .result-data table {
 	border-collapse: collapse;
+    width: 100%
 }
 
 .result-data table td {
 	padding: 4px;
 }
 
-.result-data th td {
+.result-data thead td {
 	font-weight: bold;
 }
 
+.result-data tr:nth-child(odd) {
+    background: rgba(255,255, 255, 0.2);
+}
+
+.result-data tr:hover {
+    background: #fff;
+}
+
 .result-data table, .result-data th, .result-data td {
-	border: 1px solid #aaaaaa;
+	border: 1px solid #ccc;
 }
 
 .sql-explorer-query-field .warning {

@@ -10,7 +10,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use SilverStripe\ORM\ArrayList;
-
+use SilverStripe\ORM\DB;
 /**
  * This subclass is required because the detail form requires extra actions
  * on the edit form. While SS documentation says this is easy to do, by the model
@@ -23,20 +23,23 @@ use SilverStripe\ORM\ArrayList;
 class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest
 {
 
-    private static $allowed_actions = array(
+    private static $allowed_actions = [
         'edit',
         'view',
         'ItemEditForm',
         'getData',
         'export'
-    );
+    ];
 
-    private static $url_handlers = array(
+    private static $url_handlers = [
         '$Action!' => '$Action',
         '' => 'edit',
-    );
+    ];
 
-    // API method to get data for ajax request. Returns an application/json response.
+    /**
+     * API method to get data for ajax request. Returns an application/json
+     * response.
+     */
     public function getData()
     {
         $controller = Controller::curr();
@@ -44,6 +47,7 @@ class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest
 
         try {
             $response = $this->getDataInternal();
+
             if (!is_array($response)) {
                 throw new Exception('Could not execute data');
             }
@@ -56,19 +60,28 @@ class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest
                 'temCount' => 0,
                 'totalCount' => 0
             );
+
             return Convert::raw2json($response);
         }
     }
 
-    // A simple error handler that is set for the SQL execution, which takes a user error
-    // and throws it as an exception. This lets us catch it and return it in the ajax response.
+    /**
+     * A simple error handler that is set for the SQL execution, which takes a
+     * user error and throws it as an exception. This lets us catch it and
+     * return it in the ajax response.
+     *
+     * @param int $errorNo
+     * @param string $message
+     */
     public function errorHandler($errorNo, $message)
     {
         throw new Exception($message);
     }
 
-    // Actual implementation to fetch the query, check security and execute it. Returns a map with
-    // response properties. Errors are thrown as exceptions.
+    /**
+     * Actual implementation to fetch the query, check security and execute it.
+     * Returns a map with response properties. Errors are thrown as exceptions.
+     */
     protected function getDataInternal()
     {
         if (!Permission::checkMember(Member::currentUser(), 'ADMIN')) {
@@ -76,21 +89,20 @@ class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest
         }
 
         // Set an error handler to catch SQL errors
-        set_error_handler(array('SQLExplorerQueryGrid_ItemRequest', 'errorHandler'));
+        set_error_handler(array(
+            SQLExplorerQueryGrid_ItemRequest::class,
+            'errorHandler'
+        ));
 
         $sql = $_REQUEST['query'];
+
         if (!$this->validSQL($sql)) {
             throw new Exception("Invalid SQL");
         }
 
-        // Execute the query, with errors being generated as a warning, so the error handler will see it.
-        // (The default is fatal, and the error handler is not invoked.)
         $raw = DB::query($sql, E_USER_WARNING);
+        $items = [];
 
-        // return the data as a JSON object containing a collection, each record being an object in that
-        // collection. We need to be mindful that the dataset may be large.
-
-        $items = array();
         foreach ($raw as $record) {
             foreach ($record as $key => $value) {
                 if ($this->columnOK($key)) {
@@ -99,6 +111,7 @@ class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest
                     unset($record[$key]);
                 }
             }
+
             $items[] = $record;
         }
 
@@ -112,15 +125,22 @@ class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest
         return $response;
     }
 
-    // Determine if this SQL statement should allowed to be executed. We only support read-only queries, so it's
-    // got to start with a "select".
-    // @todo determine if it is at all possible for a select state to have side effects.
+    /**
+     * Determine if this SQL statement should allowed to be executed. We only
+     * support read-only queries, so it's  got to start with a "select".
+     *
+     * @param string $sql
+     *
+     * @return boolean
+     */
     protected function validSQL($sql)
     {
         $sql = trim($sql);
+
         if (strtoupper(substr($sql, 0, 7)) != "SELECT ") {
             return false;
         }
+
         return true;
     }
 
@@ -142,6 +162,7 @@ class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest
         if (in_array($colName, $protectedColumns)) {
             return false;
         }
+
         return true;
     }
 

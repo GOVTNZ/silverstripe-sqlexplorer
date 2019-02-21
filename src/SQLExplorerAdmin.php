@@ -6,12 +6,12 @@ use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
+use SilverStripe\Forms\GridField\GridFieldDetailForm;
 
 class SQLExplorerAdmin extends ModelAdmin implements PermissionProvider
 {
     private static $managed_models = [
-        // 'SQLExplorerTable',
-        'SQLExplorerSavedQuery'
+        SQLExplorerSavedQuery::class
     ];
 
     private static $menu_title = 'SQL Explorer';
@@ -27,9 +27,11 @@ class SQLExplorerAdmin extends ModelAdmin implements PermissionProvider
     ];
 
     /**
-     * If true, this admin requires that a user explicitly has SQL_EXPLORER permission. The purpose is to
-     * have strict and explicit control. Without it, any user in the administrators group will by default
-     * have access, which can be undesirable because non-technical users are frequently set up as administrators.
+     * If true, this admin requires that a user explicitly has SQL_EXPLORER
+     * permission. The purpose is to have strict and explicit control. Without
+     * it, any user in the administrators group will by default have access,
+     * which can be undesirable because non-technical users are frequently set
+     * up as administrators.
      *
      * @config
      */
@@ -63,40 +65,27 @@ class SQLExplorerAdmin extends ModelAdmin implements PermissionProvider
 
     public function getEditForm($id = null, $fields = null)
     {
-        if ($this->modelClass == 'SQLExplorerSavedQuery') {
+        if ($this->modelClass == SQLExplorerSavedQuery::class) {
             return $this->getQueryEditForm($id, $fields);
         }
 
-        if ($this->modelClass == 'SQLExplorerTable') {
-            return $this->getTableEditForm($id, $fields);
-        }
-
-        // should never get here, but if it does, scaffhold the default
         return parent::getEditForm($id, $fields);
     }
 
-    // Get the edit form for saved queries. Pretty much default editor, except that we
-    // add a custom ItemRequest for the ajax methods that support the detail editor.
+    /**
+     * Get the edit form for saved queries. Pretty much default editor, except
+     * that we add a custom ItemRequest for the ajax methods that support the
+     * detail editor.
+     */
     public function getQueryEditForm($id, $fields)
     {
         $list = $this->getList();
 
         $form = parent::getEditForm($id, $fields);
-        $field = $form->Fields()->fieldByName('SQLExplorerSavedQuery');
-        $detailEditor = $field->getConfig()->getComponentByType('GridFieldDetailForm');
-        $detailEditor->setItemRequestClass('SQLExplorerQueryGrid_ItemRequest');
+        $field = $form->Fields()->first();
 
-        return $form;
-    }
-
-    // // Get the edit form for tables.
-    // // @todo Implement getTableEditForm
-    public function getTableEditForm($id, $fields)
-    {
-        $form = parent::getEditForm($id, $fields);
-
-        $field = $form->Fields()->fieldByName('SQLExplorerTable');
-        $field->getConfig()->removeComponentsByType('GridFieldSortableHeader');
+        $detailEditor = $field->getConfig()->getComponentByType(GridFieldDetailForm::class);
+        $detailEditor->setItemRequestClass(SQLExplorerQueryGrid_ItemRequest::class);
 
         return $form;
     }
