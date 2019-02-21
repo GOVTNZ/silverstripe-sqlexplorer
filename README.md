@@ -1,12 +1,17 @@
 # Introduction
 
-SQL Explorer is a simple module that provides read-only access to database tables, and read-only SQL statements. It is intended for deployment in production environments, with restricted user access.
+[![Version](http://img.shields.io/packagist/v/govtnz/silverstripe-sqlexplorer.svg?style=flat)](https://packagist.org/packages/govtnz/silverstripe-sqlexplorer)
+[![License](http://img.shields.io/packagist/l/govtnz/silverstripe-sqlexplorer.svg?style=flat)](LICENSE.md)
+
+SQL Explorer is a simple module that provides read-only access to database tables, and read-only SQL statements. It is 
+intended for deployment in production environments, with restricted user access.
 
 The tools is designed to facilite adhoc queries on a production database, where access is otherwise limited.
 
 # WARNING
 
-Before installing this module, it is recommended that you consult with technical governance within your organisation as applicable.
+Before installing this module, it is recommended that you consult with technical governance within your organisation 
+as applicable.
 
 # Restrictions
 
