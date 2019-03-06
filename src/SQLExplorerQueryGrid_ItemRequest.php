@@ -11,6 +11,7 @@ use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DB;
+
 /**
  * This subclass is required because the detail form requires extra actions
  * on the edit form. While SS documentation says this is easy to do, by the model
@@ -70,8 +71,8 @@ class SQLExplorerQueryGrid_ItemRequest extends GridFieldDetailForm_ItemRequest
      * user error and throws it as an exception. This lets us catch it and
      * return it in the ajax response.
      *
-     * @param int $errorNo
-     * @param string $message
+     * @param integer $errorNo
+     * @param string  $message
      */
     public function errorHandler($errorNo, $message)
     {
