@@ -1,5 +1,5 @@
 {
-	"name": "govtnz/sqlexplorer",
+	"name": "govtnz/silverstripe-sqlexplorer",
 	"description": "A SilverStripe module to provide read-only access to a database for suitably priveleged users.",
 	"type": "silverstripe-module",
 	"homepage": "http://github.com/govtnz/silverstripe-sqlexplorer",
