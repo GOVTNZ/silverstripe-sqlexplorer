@@ -4,6 +4,7 @@ namespace GovtNZ\SilverStripe\SqlExplorer;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Forms\LiteralField;
+use SilverStripe\Control\Director;
 
 class SQLExplorerSavedQuery extends DataObject
 {
@@ -24,7 +25,11 @@ class SQLExplorerSavedQuery extends DataObject
         $fields->addFieldsToTab('Root.Main', [
             new SQLExplorerQueryField('SQLText', 'SQL query'),
             new LiteralField('ResultData', '<div class="sql-explorer result-data"></div>'),
-            new LiteralField('QueryError', '<div class="sql-explorer query-error"></div>')
+            new LiteralField('QueryError', '<div class="sql-explorer query-error"></div>'),
+            LiteralField::create('Environment', sprintf(
+                '<div class="alert alert-info" style="margin-top: 10px">Environment: <strong>%s</strong></div>',
+                Director::get_environment_type()
+            ))
         ]);
 
         return $fields;

@@ -2,11 +2,13 @@
 
 namespace GovtNZ\SilverStripe\SqlExplorer;
 
+use SilverStripe\Control\Director;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\Forms\LiteralField;
 
 class SQLExplorerAdmin extends ModelAdmin implements PermissionProvider
 {
@@ -65,11 +67,19 @@ class SQLExplorerAdmin extends ModelAdmin implements PermissionProvider
 
     public function getEditForm($id = null, $fields = null)
     {
+
         if ($this->modelClass == SQLExplorerSavedQuery::class) {
-            return $this->getQueryEditForm($id, $fields);
+            $form = $this->getQueryEditForm($id, $fields);
         }
 
-        return parent::getEditForm($id, $fields);
+        $form = parent::getEditForm($id, $fields);
+
+        $form->Fields()->push(LiteralField::create('Environment', sprintf(
+            '<div class="alert alert-info" style="margin-top: 10px">Environment: <strong>%s</strong></div>',
+            Director::get_environment_type()
+        )));
+
+        return $form;
     }
 
     /**
